@@ -29,6 +29,8 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: Run website health check
+        id: healthcheck
+        continue-on-error: true
         run: npm test
 
       - name: Upload test reports
@@ -40,3 +42,33 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 30
+
+      - name: Send email report
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.zoho.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.ZOHO_SMTP_USER }}
+          password: ${{ secrets.ZOHO_SMTP_PASSWORD }}
+          subject: >-
+            ${{ steps.healthcheck.outcome == 'success' && 'SUCCESS' || 'FAILED' }}
+            - Tekno Kurgu Website Health Check
+          to: korhan.yuzbasioglu@teknokurgu.com.tr
+          from: sendmail@teknokurgu.com.tr
+          body: |
+            TEKNO KURGU - DAILY WEBSITE HEALTH CHECK
+
+            Test result: ${{ steps.healthcheck.outcome }}
+
+            Repository: ${{ github.repository }}
+
+            Detailed report:
+            https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            This report was generated automatically by GitHub Actions.
+
+      - name: Mark workflow as failed if health check failed
+        if: steps.healthcheck.outcome == 'failure'
+        run: exit 1

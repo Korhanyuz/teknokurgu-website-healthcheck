@@ -47,7 +47,7 @@ jobs:
         if: always()
         uses: dawidd6/action-send-mail@v3
         with:
-          server_address: smtp.zoho.com
+          server_address: smtppro.zoho.eu
           server_port: 465
           secure: true
           username: ${{ secrets.ZOHO_SMTP_USER }}

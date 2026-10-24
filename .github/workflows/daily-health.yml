@@ -3,7 +3,7 @@ name: Daily Website Health Check
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 5 * * *'
+    - cron: '0 23 * * *' # 23:00 UTC = ertesi gün 02:00 Türkiye
 
 permissions:
   contents: read
